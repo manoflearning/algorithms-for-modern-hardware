@@ -10,10 +10,10 @@ const int XMIN = INT_MIN;
 const int XMAX = INT_MAX;
 
 int main() {
-    std::ofstream fout("data-merge-sort.bin", std::ios::binary | std::ios::out);
+    std::ofstream fout("merge-sort-data.bin", std::ios::binary | std::ios::out);
 
     if (!fout) {
-        std::cerr << "failed to open data-merge-sort.bin\n";
+        std::cerr << "failed to open merge-sort-data.bin\n";
         return 1;
     }
 
