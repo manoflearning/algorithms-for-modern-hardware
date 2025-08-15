@@ -2,18 +2,19 @@
 #include <fstream>
 #include <random>
 #include <iomanip>
+#include <climits>
 
-const int64_t N = (1ll << 32); // size of data set (stored in external memory)
+const int32_t N = (1ll << 32) / 4; // size of data set (stored in external memory)
 const int32_t M = (1 << 28) / 4; // available internal memory
 
 const int XMIN = INT_MIN;
 const int XMAX = INT_MAX;
 
 int main() {
-    std::ofstream fout("merge-sort-data.bin", std::ios::binary | std::ios::out);
+    std::ofstream fout("dataset/ms-data.bin", std::ios::binary | std::ios::out);
 
     if (!fout) {
-        std::cerr << "failed to open merge-sort-data.bin\n";
+        std::cerr << "failed to open ms-data.bin\n";
         return 1;
     }
 
