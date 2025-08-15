@@ -47,7 +47,7 @@ int main() {
     auto t0 = std::chrono::steady_clock::now();
     merge_sort(0, N, a, b);
     auto t1 = std::chrono::steady_clock::now();
-    
+
     auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
     std::clog << "took " << diff << " ms\n";
 
