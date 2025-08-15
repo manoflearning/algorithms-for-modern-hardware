@@ -218,6 +218,99 @@ jmp rcx
 
 the memory region between `rbp` and `rsp` is called a **stack frame**, and this is where local variables of functions are typically stored. it is pre-allocated at the start of the program, and if you push more data on the stack than its capacity, you encounter a stack overflow error. because modern operating systems don't actually give you memory pages until you read or write to their address space, you can freely specify a very large stack size, which acts more like a limit on how much stack memory can be used, and not a fixed amount every program has to use.
 
+(Hardware stack is in RAM)
+
 ### Calling Conventions
 
-WIP
+SKIPPED
+
+### Inlining
+
+to avoid accessing stack memory
+
+### Tail Call Elimination
+
+if the recursive function returns right after making a recursive call, we called it **tail recursive**.
+
+factorial function:
+```cpp
+int factorial(int n) {
+    if (n == 0)
+        return 1;
+    return factorial(n - 1) * n;
+}
+```
+
+tail-recursive factorial function:
+```cpp
+int factorial(int n, int p = 1) {
+    if (n == 0)
+        return p;
+    return factorial(n - 1, p * n);
+}
+```
+
+the primary reason why recursion can be slow is that it needs to read and write data to the stack, while iterative and tail-recursive algorithms do not.
+
+## Indirect Branching
+
+During assembly, all labels are converted to addresses (absolute or relative) and then encoded into jump instructions.
+
+You can also jump by a non-constant value stored inside a register, which is called a computed jump:
+```nasm
+jmp rax
+```
+
+This has a few interesting applications related to dynamic languages and implementing more complex control flow.
+- dynamic language: 
+    - language which determines a lot in runtime (not compile time)
+    - Python, JavaScript, Ruby, Lua, ...
+
+### Multiway Branch
+
+When we have control over the range of values that the variable can take, we can use the following trick utilizing computed jumps. create a branch table that contains pointers/offsets to possible jump locations, and just index it with the `state` variable taking values in the $[0, n)$ range.
+
+Compilers use this technique when the values are densely packed together (not necessarily strictly sequentially)
+
+### Dynamic Dispatch
+
+Indirect branching is also instrumental in implementing runtime polymorphism.
+
+## Machine Code Layout
+
+pipeline of a CPU:
+- front-end: where instructions are fetched from memory and decoded
+- back-end: where they are scheduled and finally executed
+
+typically, the performance is bottlenecked by the execution stage, and for this reason, most of out efforts in this book are going to. be spent towards optimizing around the back-end.
+
+the reverse can happen when the front-end doesn't feed instructions to the back-end fast enough to saturate it.
+
+### CPU Front-End
+
+two important stages: fetch and decode
+
+fetch stage:
+- CPU simply loads a fixed-size chunk of bytes from the main memory, which contains the binary encodings of some number of instructions.
+- block size is typically 32 bytes on x86, although it may vary on different machines.
+- Important nuance: this block has to be aligned
+    - the address of the chunk must be multiple of its size (32B, in our case)
+
+decode stage:
+- the CPU looks at this chunk of bytes, discards everything that comes before the instruction pointer, and splits the rest of them into instructions.
+- machine instructions are encoded using a variable number of bytes
+- we have a certain machine-dependent limit called the decode width, which means that on each cycle up to decode width instructions can be decoded and passed to the next stage
+
+### Code Alignment
+
+compilers typically prefer instructions with shorter machine code, because this way more instructions can fit in a single 32B fetch block, and also because it reduces the size of the binary.
+
+but sometimes the reverse is prefereable, due to the fact that the fetched instructions' blocks must be aligned.
+
+### Instruction Cache
+
+SKIPPED
+
+### Unequal Branches
+
+SKIPPED
