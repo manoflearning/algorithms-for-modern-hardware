@@ -57,18 +57,16 @@ void merge_sort(size_t l, size_t r, FILE *in, FILE *out, int32_t *buf) {
     size_t i = l, j = mid + 1;
     size_t i_prv = i, j_prv = j, k_prv = l;
 
-    read_slice(in, i, buf, 0, B);
-    read_slice(in, j, buf, B, B);
+    read_slice(in, i, buf, 0, (B <= mid - i + 1 ? B : mid - i + 1));
+    read_slice(in, j, buf, B, (B <= r - j ? B : r - j));
 
     for (size_t k = l; k < r; k++) {
         if (i - i_prv >= B) {
-            size_t n = (B <= mid - i + 1 ? B : mid - i + 1);
-            read_slice(in, i, buf, 0, n);
+            read_slice(in, i, buf, 0, (B <= mid - i + 1 ? B : mid - i + 1));
             i_prv = i;
         }
         if (j - j_prv >= B) {
-            size_t n = (B <= r - j ? B : r - j);
-            read_slice(in, j, buf, B, n);
+            read_slice(in, j, buf, B, (B <= r - j ? B : r - j));
             j_prv = j;
         }
 
@@ -100,7 +98,7 @@ bool is_sorted(size_t n, FILE *a, int32_t *buf) {
 
     for (size_t i = 0; i + 1 < n; i++) {
         if (i + 1 - i_prv >= B) {
-            read_slice(a, i + 1, buf, 0, B);
+            read_slice(a, i, buf, 0, B);
             i_prv = i;
         }
         if (buf[i - i_prv] > buf[i - i_prv + 1]) return 0;
