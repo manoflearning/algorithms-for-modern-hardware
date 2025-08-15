@@ -83,12 +83,10 @@ void merge_sort(size_t l, size_t r, FILE *in, FILE *out, int32_t *buf) {
     }
     write_slice(out, k_prv, buf, 2 * B, r - k_prv);
 
-    for (size_t k = l; k < r; k++) {
-        if ((k - l) % B == 0) {
-            size_t n = (B <= r - k ? B : r - k);
-            read_slice(out, k, buf, 0, n);
-            write_slice(in, k, buf, 0, n);
-        }
+    for (size_t k = l; k < r; k += B) {
+        size_t n = (B <= r - k ? B : r - k);
+        read_slice(out, k, buf, 0, n);
+        write_slice(in, k, buf, 0, n);
     }
 }
 
@@ -98,7 +96,7 @@ bool is_sorted(size_t n, FILE *a, int32_t *buf) {
 
     for (size_t i = 0; i + 1 < n; i++) {
         if (i + 1 - i_prv >= B) {
-            read_slice(a, i, buf, 0, B);
+            read_slice(a, i, buf, 0, (B <= n - i ? B : n - i));
             i_prv = i;
         }
         if (buf[i - i_prv] > buf[i - i_prv + 1]) return 0;
@@ -115,12 +113,10 @@ int main() {
 
     int32_t *buf = new int32_t[M];
 
-    for (size_t i = 0; i < N; i++) {
-        if (i % B == 0) {
-            size_t n = B <= N - i ? B : N - i;
-            read_slice(a, i, buf, 0, n);
-            write_slice(b, i, buf, 0, n);
-        }
+    for (size_t i = 0; i < N; i += B) {
+        size_t n = B <= N - i ? B : N - i;
+        read_slice(a, i, buf, 0, n);
+        write_slice(b, i, buf, 0, n);
     }
 
     auto t0 = std::chrono::steady_clock::now();
